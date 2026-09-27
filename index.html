@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Travel Mine — Phase 1 Scope</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #fdfcfb;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --accent: #d64545;
+    --accent-soft: #fdeeee;
+    --border: #e8e3dc;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  h1 {
+    font-size: 1.9rem;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  h2 {
+    font-size: 1.25rem;
+    margin-top: 40px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent-soft);
+    color: var(--accent);
+  }
+  p { margin: 10px 0; }
+  p.numbered { margin: 6px 0; }
+  ul { padding-left: 20px; margin: 10px 0; }
+  li { margin: 4px 0; }
+  .meta {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+  .diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 12px;
+    margin: 16px 0 20px;
+    overflow-x: auto;
+    text-align: center;
+  }
+  .diagram svg {
+    max-width: 100%;
+    height: auto;
+  }
+  strong { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>The Travel Mine — Phase 1 Scope (WhatsApp Lead-to-Trip Flow)</h1>
+<p>Sep 22, 2026 · @Prateek</p>
+<h2>1. Overview</h2>
+<p>Client is starting with a focused <strong>Phase 1</strong>: one complete lead-to-trip journey, proving out automated lead capture and personalized customer messaging before the rest of the requirements doc is built.</p>
+<h2>2. Phase 1 Goal</h2>
+<p>Lead comes in and is created automatically → staff work it and book manually → automated, personalized WhatsApp messages take over once a trip exists.</p>
+<h2>3. Stage 1 — Inbound WhatsApp Lead Capture</h2>
+<div class="diagram"><pre class="mermaid">
+flowchart LR
+    A[Customer messages\nWhatsApp] --> B{Automated menu:\nVisa / Ticketing /\nHotel / Other}
+    B --> C[Customer picks\na service]
+    C --> D[Form link sent\nauto-matched to service]
+    D --> E[Customer fills\nform]
+    E --> F[(Lead auto-created\nno staff involved)]
+</pre></div>
+<ul>
+<li>Menu options and forms are per service type, configurable</li>
+<li>Every lead is timestamped and tagged with service + source</li>
+</ul>
+<h2>4. Stage 2 — Admin Lead Management</h2>
+<div class="diagram"><pre class="mermaid">
+flowchart LR
+    F[(New lead)] --> G[Staff alerted\nin-app/email/WhatsApp]
+    G --> H[Staff picks up\n& contacts customer]
+    H --> I{Status updated?}
+    I -- No, X hrs pass --> J[Auto-reminder\nto staff]
+    J --> H
+    I -- Yes --> K[Status moves:\nNew -> Contacted ->\nQuoted -> Booking ->\nBooked -> Closed]
+</pre></div>
+<ul>
+<li>Reminder timing (X hrs) is configurable, not fixed</li>
+<li>Leads assignable/reassignable to staff</li>
+</ul>
+<h2>5. Stage 3 — Manual Booking & Trip Profile Creation</h2>
+<p>Booking stays manual — software supports it, doesn't automate it.</p>
+<div class="diagram"><pre class="mermaid">
+flowchart LR
+    H[Staff talks to\ncustomer] --> L[Flight suggested\n& confirmed]
+    L --> M[Staff books flight\nmanually, outside system]
+    M --> N[Staff enters flight\ndetails in software]
+    N --> O{Hotel needed?}
+    O -- Yes --> P[Staff books hotel\nmanually, enters details]
+    O -- No --> Q
+    P --> Q[(Trip profile\nauto-created)]
+</pre></div>
+<ul>
+<li>Trip profile forms automatically once flight/hotel details are saved — no separate step</li>
+<li>Profile holds destination, arrival date/time, hotel address — enough to drive Stage 4</li>
+</ul>
+<h2>6. Stage 4 — Automated Customer Experience Messaging</h2>
+<p>Once a trip profile exists, messages send automatically — no staff typing.</p>
+<div class="diagram"><pre class="mermaid">
+flowchart LR
+    Q[(Trip profile)] --> R[[Trigger rules\nadmin-configurable]]
+    R --> S1[Pre-departure\nreminder]
+    R --> S2[Arrival welcome\n+ weather + hotel distance]
+    R --> S3[Any other trigger\nadmin defines]
+    S1 & S2 & S3 --> T[WhatsApp message\nsent to customer]
+</pre></div>
+<p><strong>Key requirement: triggers are configurable, not hardcoded.</strong> Admin can attach a message to <em>any</em> point in the trip lifecycle — any date field (departure, arrival, check-in, check-out), any status change, or a custom offset (e.g. "6 hours before departure," "1 day after return") — and edit the message template, without needing a developer to add a new trigger.</p>
+<ul>
+<li>Arrival message needs weather + airport-to-hotel distance lookups</li>
+<li>Messages personalized with customer name, flight, hotel — not generic broadcasts</li>
+</ul>
+<h2>7. End-to-End Flow</h2>
+<div class="diagram"><pre class="mermaid">
+flowchart TD
+    A[Customer messages WhatsApp] --> B[Automated menu: Visa / Ticketing / Hotel / Other]
+    B --> C[Customer selects a service]
+    C --> D[System sends short form link]
+    D --> E[Customer fills form]
+    E --> F[Lead auto-created in software]
+    F --> G[Staff notified of new lead]
+    G --> H[Staff follows up with customer manually]
+    H --> I[System reminds staff if lead goes quiet]
+    I --> J[Staff books flight/hotel manually - outside software]
+    J --> K[Staff enters confirmed flight/hotel details]
+    K --> L[Trip profile auto-created]
+    L --> M[Pre-departure reminder sent automatically]
+    L --> N[Arrival welcome message sent automatically]
+    L --> O[Other trip-relevant notices sent automatically]
+</pre></div>
+<p>Stage 1 and Stage 4 are automated; Stages 2–3 are human-driven, with the system reminding and recording.</p>
+<h2>8. Out of Scope for Phase 1</h2>
+<p>The following, described in the full Software Requirements Document, are deferred to later phases:</p>
+<ul>
+<li>Full Client Profile/CRM with complete travel history, visa history, family/group members, and communication history (Phase 1 only needs enough of a profile to support the trip and messaging)</li>
+<li>Visa processing status tracking (Module 2)</li>
+<li>Secure group-booking document vault (Module 4)</li>
+<li>Rewards/travel points system (Module 5)</li>
+<li>Bulk messaging/campaigns (Module 6)</li>
+<li>Pre-travel document checklist automation (Module 8)</li>
+<li>Vendor/payment follow-up tracking (Module 9)</li>
+<li>Any of the Suggested Additions (client portal, payment gateway, e-signature, AI itinerary drafting, analytics dashboard, referral tracking, etc.)</li>
+<li>Automated flight booking itself — booking stays a manual, human-led process in Phase 1</li>
+</ul>
+<h2>9. Open Questions for the Client</h2>
+<p class="numbered">1. What should the WhatsApp menu options be, exactly, for Phase 1 — Visa, Ticketing, Hotel, and anything else, or just Ticketing to start?</p>
+<p class="numbered">2. What fields should the short intake form ask for per service type (e.g. for Ticketing: dates, pax, departure city, budget — anything else)?</p>
+<p class="numbered">3. How should "lead has gone quiet" be defined — after how many hours/days with no status update should staff get a reminder?</p>
+<p class="numbered">4. Who should new-lead notifications go to — a specific person, a team inbox, or whoever is assigned?</p>
+<p class="numbered">5. For the arrival weather/distance message — is a rough estimate (e.g. from the hotel address on file) acceptable, or does it need live flight-landing detection?</p>
+<p class="numbered">6. Which WhatsApp Business Solution Provider (e.g. Gupshup, Interakt, Twilio) should we use, if the client already has a preference?</p>
+</div>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#fdeeee',
+      primaryTextColor: '#1f2430',
+      primaryBorderColor: '#d64545',
+      lineColor: '#8a8f98',
+      fontFamily: '-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif'
+    }
+  });
+</script>
+</body>
+</html>
